@@ -1,0 +1,120 @@
+diff -uNr a/v-ada/MANIFEST.txt b/v-ada/MANIFEST.txt
+--- a/v-ada/MANIFEST.txt bd94371ea395a2dfed2567efd43085fcd4b9cc3e8b2b7d02273701255274e6e14bfad316c2f5995e0f452e22ae8abefc9f4572547deb6985c5158ceb5108dc01
++++ b/v-ada/MANIFEST.txt 7fec29506cce8564176dd07323ab700799bc75d308138dabe49742c15c83d46e3a168f9ac5941473f48bdb22d3d93ab2d8fa8de23f792609d0b44e7c3dd06644
+@@ -1,2 +1,3 @@
+ (Block - Author - patch - "Changes notes")
+ 893797 - PeterL - v-ada_genesis - "Genesis"
++894416 - PeterL - v-ada_temp_wot - "Switch WoT to use a temporary gpg keyring"
+diff -uNr a/v-ada/README.txt b/v-ada/README.txt
+--- a/v-ada/README.txt a1d46c2e5b99fe7671a3d31d10fbd8fbd5a30f11d50421ed3e3e865dfced12abb330350024cb214df06326e9cc0da7dfec7283ec0cae5773e62f24782098ed5f
++++ b/v-ada/README.txt cb3a6cd07933a498fdc5e00e4bb1c7cb6223640c85a6b147ba954505dae788185a8659c8c2934bfa7a77b7aa709fb6bff7f0d58eedd2dc0d50ac52ee89e05008
+@@ -16,11 +16,7 @@
+ Note: Since the program only takes files with the correct file extension for 
+ each file type, it is possible to store all the files together in one folder.
+ 
+-Note: Since the program is calling out to gpg for verification, if keys are 
+-pre-loaded to gpg before running then they do not need to be present in the
+-WoT directory.
+-
+-This implementation is fairly bare-bones; it is the users responsibility to
++This implementation is fairly bare-bones; it is the user's responsibility to
+ choose the patches to include - any patches present in the indicated directory
+ will be applied.
+ 
+diff -uNr a/v-ada/src/sys.adb b/v-ada/src/sys.adb
+--- a/v-ada/src/sys.adb 8a193a6133485ba45da6e21d69fa18f7c3ec12a6cb19cb011e08511c57c4610c66f1fcae2b1491ac6aca97db170d302f749e23773e393982e76224266cfc698c
++++ b/v-ada/src/sys.adb 1972bd060167f0db46944b0732cea6479da31426c1427a9493d7aa57d50acf5f3cd772449314227b8efe9a82d218f01c1557f71b7caa0f4bae7639fd7a8f2a28
+@@ -37,4 +37,15 @@
+ 	end Path_Join;
+ 	
+ 	
+-end Sys;
+\ No newline at end of file
++	function Get_Temp_Dir return String is
++		TD : String  := "temp";
++		N  : Integer := -1;
++	begin
++		while Ada.Directories.Exists(TD & N'Image) loop
++			N := N - 1;
++		end loop;
++		Ada.Directories.Create_Directory(TD & N'Image);
++		return TD & N'Image;
++	end Get_Temp_Dir;
++	
++end Sys;
+diff -uNr a/v-ada/src/sys.ads b/v-ada/src/sys.ads
+--- a/v-ada/src/sys.ads b20b7da28efcae3f7e1516a14babb253ef8568783f40257361a14671cee157be2d01c3d173fa153852708ed6d31befe55c1e65759a652496318001c44aaba7ec
++++ b/v-ada/src/sys.ads 00fc1992ac76ff9546f540cab53f8dad829eb11d7306e6742610ca585f9eccb6adacba5150636e7c175acfe3615cc448754eff4d9b5b3e78fa2e8fbd49854dec
+@@ -16,6 +16,7 @@
+ 
+ with Interfaces.C; use Interfaces.C;
+ with Ada.Command_Line;
++with Ada.Directories;
+ 
+ 
+ package Sys is
+@@ -29,6 +30,9 @@
+ 	
+ 	function Path_Join(A : String; B : String) return String;
+ 	
++	function Get_Temp_Dir return String;
++	
++	
+ private
+ 
+ 	function System(Arg : Char_Array) return Int;
+diff -uNr a/v-ada/src/v.adb b/v-ada/src/v.adb
+--- a/v-ada/src/v.adb e5ae2bbc69f9b321643fb0901bd705630637f71ca67f8c5304c3c1a440d219baf802aca98b4e5e6bcb5bae0f45f9d0e7b33465a9bdd182c677045b770a57c96b
++++ b/v-ada/src/v.adb bdfa61d60bed94738144bb9ddc98eccd5acb0818072d398abc2e45843c9e2dbfd80977af3896f879e525f2768414b4d61c80cf8d2bd5cdb5582a4357869297d6
+@@ -144,6 +144,8 @@
+ 	-- Variables for use below
+ 	Dirs : array(Dir_Values) of Str_L;
+ 	
++	GPG_Temp_Dir : String := Get_Temp_Dir;
++	
+ 	Arg_Num  : Natural := 1;
+ 	
+ 	
+@@ -257,11 +259,11 @@
+ 		Cur      : State_List.LL_Ptr;
+ 	begin
+ 		
+-		-- import sigs
++		-- import keys
+ 		Spew("--- Importing keys ..");
+ 		for Key of Wot_Files loop
+-			Run_Command(Command => "gpg --import " & 
+-			                       Get(Dirs(Wot)) & "/" & Get(Key), 
++			Run_Command(Command => "gpg --homedir " & GPG_Temp_Dir & " --import " 
++			                       & Path_Join(Get(Dirs(Wot)), Get(Key)), 
+ 			            Result => Result);
+ 			if Result /= Success then
+ 				raise V_Error with "Failed to load key: " & Get(Key);
+@@ -277,7 +279,8 @@
+ 			for Seal of Seal_Files loop
+ 				if Startswith(Seal, Patch) then
+ 					Found := True;
+-					Run_Command(Command => "gpg --verify " & 
++					Run_Command(Command => "gpg --always-trust --homedir " & 
++					                      GPG_Temp_Dir & " --verify " & 
+ 					                      Path_Join(Get(Dirs(Seals)), Get(Seal)) & 
+ 										       " " & 
+ 									          Path_Join(Get(Dirs(Patches)), Get(Patch)), 
+@@ -416,6 +419,17 @@
+ 		Cursor := Cursor.Next;
+ 	end loop;
+ 	
++	-- clean up temp dir
++	Delete_Tree(GPG_Temp_Dir);
++	
+ 	Spew("--- Done");
+ 	Set_Exit_Status(Success);
++	
++exception
++	when others =>
++		if Exists(GPG_Temp_Dir) then
++			Delete_Tree(GPG_Temp_Dir);
++		end if;
++		
++		raise;	
+ end V;

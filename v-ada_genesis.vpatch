@@ -1,0 +1,966 @@
+diff -uNr a/v-ada/LICENSE.txt b/v-ada/LICENSE.txt
+--- a/v-ada/LICENSE.txt false
++++ b/v-ada/LICENSE.txt 92cc5d5ffff9a4427c3157e44f567c8d9c6627caeb4d606359879645a2f1a63ad8d6671700fe60e07668083a3baad81c61480b76234ad4be48cce90e595bf97e
+@@ -0,0 +1,64 @@
++
++(C) 2025 Peter Lambert  
++
++This product is distributed under "The V Public License" ("VPL"; version 0xFF.)
++
++This means that it is a document with a cryptographically-verifiable history of 
++attributable authorship, rather than one of the many vile agglomerations of 
++faecal droppings from anonymous vermin typically met with in public digital 
++cesspools.
++
++The V Public License mandates that all redistribution of this product is to take 
++the canonical form of a VTree, which consists of: a Genesis VPatch; zero or more 
++revision VPatches; and one or more VSeals which authenticate each such VPatch, 
++including the Genesis.
++
++A VPatch is defined as the output of "VDiff" on a revision against its 
++predecessor: this is presently equivalent to standard Unix 
++"diff -uNr PREDECESSOR SUCCESSOR", where the timestamp normally found in every 
++delta is replaced with a Keccak hash of the original or transformed file. A 
++Genesis VPatch is a VDiff of a "revision" constituting the initial public 
++release of the product against a null predecessor (i.e. an empty directory).
++
++A VSeal is a public key signature (typically generated via GPG or a compatible 
++program) of a particular VPatch, by an author, coauthor, or reviewer who wishes 
++to be known as a signatory. If the creator of a VSeal has a public presence, 
++e.g. a WWW site, the public key against which the VSeal validates must be 
++publicly accessible and publicly associated with said presence (e.g. offered 
++for download on the creator's WWW site.)
++
++This product may be used for ANY PURPOSE WHATSOEVER, and is supplied with NO 
++WARRANTY OF ANY KIND, unless otherwise specified by written and signed 
++agreements with all of its VSeal signatories.
++
++However, if you choose to redistribute the product and/or any changes you have 
++made to it, you must do so in VTree form, and the latter must include all 
++VPatches and VSeals you had originally received. The VTree you redistribute must 
++be fully-compatible in every respect with the format of the one you had 
++received.
++
++You may offer copies of a VPL-licensed product for download to third parties in 
++variant (i.e. non-VTree) forms, so long as the canonical VTree form at all times 
++exactly corresponding to every such variant is made readily and conspicuously 
++available. Concretely, this means that if you intend to distribute a binary 
++build of a VPL-licensed computer program, you must not only distribute its VTree 
++with it, but must also include any and all components and instructions required 
++to reproduce a bitwise-identical binary build.
++
++Similarly, if you distribute a VPL-licensed product as a source archive, via a 
++publicly-facing version control interface, as a printed book, inside a physical 
++device, or in any form whatsoever other than a VTree, then a VTree corresponding 
++exactly to the item you are distributing, retaining all of the history which you 
++had originally received, must be distributed along with every such variant copy.
++
++The only permitted exception to the three paragraphs above is that a 
++VPL-licensed product MAY be incorporated whole into a new (i.e. with a novel 
++Genesis) VTree, so long as the latter contains a statement of this fact, along 
++with any information required to locate and retrieve a copy of the original 
++product's canonical VTree. All provisions of the VPL shall apply to the new 
++VTree.
++
++The text of this notice is itself licensed under the VPL, and is to be retained 
++where found.
++
++
+diff -uNr a/v-ada/MANIFEST.txt b/v-ada/MANIFEST.txt
+--- a/v-ada/MANIFEST.txt false
++++ b/v-ada/MANIFEST.txt bd94371ea395a2dfed2567efd43085fcd4b9cc3e8b2b7d02273701255274e6e14bfad316c2f5995e0f452e22ae8abefc9f4572547deb6985c5158ceb5108dc01
+@@ -0,0 +1,2 @@
++(Block - Author - patch - "Changes notes")
++893797 - PeterL - v-ada_genesis - "Genesis"
+diff -uNr a/v-ada/README.txt b/v-ada/README.txt
+--- a/v-ada/README.txt false
++++ b/v-ada/README.txt a1d46c2e5b99fe7671a3d31d10fbd8fbd5a30f11d50421ed3e3e865dfced12abb330350024cb214df06326e9cc0da7dfec7283ec0cae5773e62f24782098ed5f
+@@ -0,0 +1,46 @@
++This is an implementation of V in Ada, written by Peter Lambert, (c) 2025.
++
++This product is distributed under "The V Public License" ("VPL"), see 
++LICENSE.txt.
++
++Simply put, V is a system to check the veracity of signatures for a set of 
++patches, and then apply the patches in the correct order.
++
++The program expects to find V patch files (diff files with timestamps replaced
++with file hashes, file name ending in .vpatch) in a directory, specified by the 
++-p PATCH_DIR argument. Likewise, a directory for the seals (detached signatures,
++with file names ending in .sig) should be stored in a directory specified by
++-s SEAL_DIR argument. Public keys of the patch signers should be present in a
++WoT directory specified by the -w WOT_DIR argument.
++
++Note: Since the program only takes files with the correct file extension for 
++each file type, it is possible to store all the files together in one folder.
++
++Note: Since the program is calling out to gpg for verification, if keys are 
++pre-loaded to gpg before running then they do not need to be present in the
++WoT directory.
++
++This implementation is fairly bare-bones; it is the users responsibility to
++choose the patches to include - any patches present in the indicated directory
++will be applied.
++
++Main file is v.adb, supporting files include lists.ads/adb, str.ads/adb, and 
++sys.ads/adb.
++
++
++Build:
++(in folder v-ada)
++gprbuild
++
++
++Run:
++
++bin/v [-p PATCHES] [-s SEALS] [-w WOT] [+v] TARGET_DIR
++
++ -p PATCHES : Set the directory that holds the patches. Default is "patches".
++ -s SEALS   : Set the directory that holds the seals. Default is "seals"
++ -w WOT     : Set the directory that holds the WoT public keys. 
++              Default is "wot".
++ +v         : Turn on verbose mode.
++ TARGET_DIR : Directory on which to apply patches. Directory will be created
++              if it is not already present. Default is "v_out".
+diff -uNr a/v-ada/bin/Placeholder.txt b/v-ada/bin/Placeholder.txt
+--- a/v-ada/bin/Placeholder.txt false
++++ b/v-ada/bin/Placeholder.txt 5fdbae897eb301a711bf95707f329517db540e34c182a5beec96e93d5d0d856cec2ed6b01c1191f865e8d1c45709a462c70c3005d4aa3676eb445d1479edf2e5
+@@ -0,0 +1 @@
++Placeholder.
+diff -uNr a/v-ada/obj/Placeholder.txt b/v-ada/obj/Placeholder.txt
+--- a/v-ada/obj/Placeholder.txt false
++++ b/v-ada/obj/Placeholder.txt 5fdbae897eb301a711bf95707f329517db540e34c182a5beec96e93d5d0d856cec2ed6b01c1191f865e8d1c45709a462c70c3005d4aa3676eb445d1479edf2e5
+@@ -0,0 +1 @@
++Placeholder.
+diff -uNr a/v-ada/src/lists.adb b/v-ada/src/lists.adb
+--- a/v-ada/src/lists.adb false
++++ b/v-ada/src/lists.adb f00b7a9304ded726ba9c3b32b216c0727e2e0e9539f5e8554e3e6f5635105244a77c9902078b02bd03132c971c3ff6752b239c2c0c1a1765137e1cf289d53c9b
+@@ -0,0 +1,68 @@
++-------------------------------------------------------------------------------
++-- This file is part of V-Ada.                                               --
++--                                                                           --
++-- (C) $2025 Peter Lambert                                                   --
++--                                                                           --
++-- This product is distributed under "The V Public License"                  --
++-- ("VPL"; version 0xFF.)                                                    --
++--                                                                           --
++-- This means that it is a document with a cryptographically-verifiable      --
++-- history of attributable authorship.                                       --
++--                                                                           --
++-- See LICENSE.txt for further details.                                      --
++--                                                                           --
++-- This notice is to be retained where found.                                --
++-------------------------------------------------------------------------------
++
++package body Lists is
++
++	
++	procedure Append(List : in out LL_Ptr; New_Item : in Item_Type) is
++		Cur : LL_Ptr := List;
++	begin
++		if Cur = null then
++			List := new Linked_List'(Next => null, Item => New_Item);
++		else
++			while Cur.Next /= null loop
++				Cur := Cur.Next;
++			end loop;
++			Cur.Next := new Linked_List'(Next => null, Item => New_Item);
++		end if;
++	end Append;
++	
++	
++	procedure Remove(List : in out LL_Ptr; Old_Item : in Item_Type) is
++		Cur  : LL_Ptr := List;
++		Prev : LL_Ptr := List;
++	begin
++		if Eq(List.Item, Old_Item) then
++			List := List.Next;
++			Free(Cur);
++		else
++			while Cur /= null loop
++				if Eq(Cur.Item, Old_Item) then
++					Prev.Next := Cur.Next;
++					Free(Cur);
++					exit;
++				end if;
++				Prev := Cur;
++				Cur  := Cur.Next;
++			end loop;
++		end if;
++	end Remove;
++	
++	
++	function Has(List : LL_Ptr; Search_Item : Item_Type) return Boolean is
++		Cur : LL_Ptr := List;
++	begin
++		while Cur /= null loop
++			if Eq(Cur.Item, Search_Item) then
++				return True;
++			end if;
++			Cur := Cur.Next;
++		end loop;
++		return False;
++	end Has;
++	
++	
++end Lists;
+diff -uNr a/v-ada/src/lists.ads b/v-ada/src/lists.ads
+--- a/v-ada/src/lists.ads false
++++ b/v-ada/src/lists.ads 5ef25ce0f9d88ac9c73acb5c10e96fcda8d2078756e5a18ba888457b3d2554050c43cb6b30863589362c3d9308f73fe00c5f04e4a9dab78b1aa6370af9c56ad0
+@@ -0,0 +1,44 @@
++-------------------------------------------------------------------------------
++-- This file is part of V-Ada.                                               --
++--                                                                           --
++-- (C) $2025 Peter Lambert                                                   --
++--                                                                           --
++-- This product is distributed under "The V Public License"                  --
++-- ("VPL"; version 0xFF.)                                                    --
++--                                                                           --
++-- This means that it is a document with a cryptographically-verifiable      --
++-- history of attributable authorship.                                       --
++--                                                                           --
++-- See LICENSE.txt for further details.                                      --
++--                                                                           --
++-- This notice is to be retained where found.                                --
++-------------------------------------------------------------------------------
++
++-- This is a simple linked-list generic package.
++
++with Ada.Unchecked_Deallocation;
++
++generic 
++	type Item_Type is private;
++	with function Eq (Left , Right : Item_Type) return Boolean;
++package Lists is	
++	
++	type Linked_List;
++	type LL_Ptr is access Linked_List;
++	type Linked_List is 
++		record
++			Item : Item_Type;
++			Next : LL_Ptr;
++		end record;
++	
++	procedure Free is new Ada.Unchecked_Deallocation(Linked_List, LL_Ptr);
++	
++	procedure Append(List : in out LL_Ptr; New_Item : in Item_Type);
++
++	procedure Remove(List : in out LL_Ptr; Old_Item : in Item_Type);
++	
++	function Has(List : LL_Ptr; Search_Item : Item_Type) return Boolean;
++	
++private
++
++end Lists;
+diff -uNr a/v-ada/src/str.adb b/v-ada/src/str.adb
+--- a/v-ada/src/str.adb false
++++ b/v-ada/src/str.adb 82418751004c5a99145d9360c42ed54926037fca78c89878db0af6633bd92fdeff6520f8c8b83d0bdae38ad673b2c7f1a407a12a2465bd821d2a7050e867fc96
+@@ -0,0 +1,83 @@
++-------------------------------------------------------------------------------
++-- This file is part of V-Ada.                                               --
++--                                                                           --
++-- (C) $2025 Peter Lambert                                                   --
++--                                                                           --
++-- This product is distributed under "The V Public License"                  --
++-- ("VPL"; version 0xFF.)                                                    --
++--                                                                           --
++-- This means that it is a document with a cryptographically-verifiable      --
++-- history of attributable authorship.                                       --
++--                                                                           --
++-- See LICENSE.txt for further details.                                      --
++--                                                                           --
++-- This notice is to be retained where found.                                --
++-------------------------------------------------------------------------------
++
++package body Str is
++	
++	-- Functions for Str_L type
++	procedure Set(SL : in out Str_L; S : in String) is
++	begin
++		SL.Text(1 .. S'Length) := S;
++		SL.Len := S'Length;
++	end Set;
++	
++	function Get(SL : Str_L) return String is
++	begin
++		return SL.Text(1 .. SL.Len);
++	end Get;
++	
++	function "=" (Left : Str_L; Right : Str_L) return Boolean is
++	begin
++		return Get(Left) = Get(Right);
++	end "=";
++	
++	
++	-- useful function for checking normal strings
++	function Startswith(Long : String; Short : String) return Boolean is
++	begin
++		if Long'Length < Short'Length then
++			return False;
++		else
++			for I in 0 .. Short'Length - 1 loop
++				if Short(Short'First + I) /= Long(Long'First + I) then
++					return False;
++				end if;
++			end loop;
++			return True;
++		end if;
++	end Startswith;
++	
++	
++	-- And the equivalents for use with our Str_L type
++	function Startswith(Long : Str_L; Short : String) return Boolean is
++	begin
++		if Long.Len < Short'Length then
++			return False;
++		else
++			for I in 0 .. Short'Length - 1 loop
++				if Short(Short'First + I) /= Long.Text(Long.Text'First + I) then
++					return False;
++				end if;
++			end loop;
++			return True;
++		end if;
++	end Startswith;
++	
++	function Startswith(Long : Str_L; Short : Str_L) return Boolean is
++	begin
++		if Long.Len < Short.Len then
++			return False;
++		else
++			for I in 0 .. Short.Len - 1 loop
++				if Short.Text(Short.Text'First + I) 
++				                          /= Long.Text(Long.Text'First + I) then
++					return False;
++				end if;
++			end loop;
++			return True;
++		end if;
++	end Startswith;
++
++end Str;
+diff -uNr a/v-ada/src/str.ads b/v-ada/src/str.ads
+--- a/v-ada/src/str.ads false
++++ b/v-ada/src/str.ads f5ce8fdaac4ed1f378c26c6471377e97f76115d322b641de2b31863060f6fce2d6db2744966be20a04d20465a2ec20d211dfda6fcf3eeb189d71f7e3e4be0a12
+@@ -0,0 +1,42 @@
++-------------------------------------------------------------------------------
++-- This file is part of V-Ada.                                               --
++--                                                                           --
++-- (C) $2025 Peter Lambert                                                   --
++--                                                                           --
++-- This product is distributed under "The V Public License"                  --
++-- ("VPL"; version 0xFF.)                                                    --
++--                                                                           --
++-- This means that it is a document with a cryptographically-verifiable      --
++-- history of attributable authorship.                                       --
++--                                                                           --
++-- See LICENSE.txt for further details.                                      --
++--                                                                           --
++-- This notice is to be retained where found.                                --
++-------------------------------------------------------------------------------
++
++-- Type for holding things like directory or file names
++
++package Str is
++	
++	-- We might have to increase this if there are larger file names?
++	subtype Str_Index is Natural range 1 .. 128; 
++	
++	type Str_L is 
++		record
++			Text : String(Str_Index'Range);
++			Len  : Natural;
++		end record;
++		
++	procedure Set(SL : in out Str_L; S : in String);
++	
++	function Get(SL : Str_L) return String;
++	
++	function "=" (Left : Str_L; Right : Str_L) return Boolean;
++	
++	function Startswith(Long : String; Short : String) return Boolean;
++	function Startswith(Long : Str_L;  Short : String) return Boolean;
++	function Startswith(Long : Str_L;  Short : Str_L)  return Boolean;
++	
++private
++
++end Str;
+diff -uNr a/v-ada/src/sys.adb b/v-ada/src/sys.adb
+--- a/v-ada/src/sys.adb false
++++ b/v-ada/src/sys.adb 8a193a6133485ba45da6e21d69fa18f7c3ec12a6cb19cb011e08511c57c4610c66f1fcae2b1491ac6aca97db170d302f749e23773e393982e76224266cfc698c
+@@ -0,0 +1,40 @@
++-------------------------------------------------------------------------------
++-- This file is part of V-Ada.                                               --
++--                                                                           --
++-- (C) $2025 Peter Lambert                                                   --
++--                                                                           --
++-- This product is distributed under "The V Public License"                  --
++-- ("VPL"; version 0xFF.)                                                    --
++--                                                                           --
++-- This means that it is a document with a cryptographically-verifiable      --
++-- history of attributable authorship.                                       --
++--                                                                           --
++-- See LICENSE.txt for further details.                                      --
++--                                                                           --
++-- This notice is to be retained where found.                                --
++-------------------------------------------------------------------------------
++
++package body Sys is
++
++	procedure Run_Command(Command : in  String; 
++	                       Result  : out Ada.Command_Line.Exit_Status) is
++		Res : C.int;
++		Com : C.char_array := To_C(Command);
++	begin
++		Res := System(Com);
++		if Res = 0 then
++			Result := Ada.Command_Line.Success;
++		else
++			Result := Ada.Command_Line.Failure;
++		end if;
++	end Run_Command;
++	
++	
++	-- If you want to use this on Windows, switch this function
++	function Path_Join(A : String; B : String) return String is
++	begin
++		return A & "/" & B;
++	end Path_Join;
++	
++	
++end Sys;
+\ No newline at end of file
+diff -uNr a/v-ada/src/sys.ads b/v-ada/src/sys.ads
+--- a/v-ada/src/sys.ads false
++++ b/v-ada/src/sys.ads b20b7da28efcae3f7e1516a14babb253ef8568783f40257361a14671cee157be2d01c3d173fa153852708ed6d31befe55c1e65759a652496318001c44aaba7ec
+@@ -0,0 +1,37 @@
++-------------------------------------------------------------------------------
++-- This file is part of V-Ada.                                               --
++--                                                                           --
++-- (C) $2025 Peter Lambert                                                   --
++--                                                                           --
++-- This product is distributed under "The V Public License"                  --
++-- ("VPL"; version 0xFF.)                                                    --
++--                                                                           --
++-- This means that it is a document with a cryptographically-verifiable      --
++-- history of attributable authorship.                                       --
++--                                                                           --
++-- See LICENSE.txt for further details.                                      --
++--                                                                           --
++-- This notice is to be retained where found.                                --
++-------------------------------------------------------------------------------
++
++with Interfaces.C; use Interfaces.C;
++with Ada.Command_Line;
++
++
++package Sys is
++	
++	package C renames Interfaces.C;
++	use type C.int;
++	use type C.char_array;
++	
++	procedure Run_Command(Command : in  String; 
++	                       Result  : out Ada.Command_Line.Exit_Status);
++	
++	function Path_Join(A : String; B : String) return String;
++	
++private
++
++	function System(Arg : Char_Array) return Int;
++   pragma Import(C, System, "system");
++	
++end Sys;
+diff -uNr a/v-ada/src/v.adb b/v-ada/src/v.adb
+--- a/v-ada/src/v.adb false
++++ b/v-ada/src/v.adb e5ae2bbc69f9b321643fb0901bd705630637f71ca67f8c5304c3c1a440d219baf802aca98b4e5e6bcb5bae0f45f9d0e7b33465a9bdd182c677045b770a57c96b
+@@ -0,0 +1,421 @@
++-------------------------------------------------------------------------------
++-- This file is part of V-Ada.                                               --
++--                                                                           --
++-- (C) $2025 Peter Lambert                                                   --
++--                                                                           --
++-- This product is distributed under "The V Public License"                  --
++-- ("VPL"; version 0xFF.)                                                    --
++--                                                                           --
++-- This means that it is a document with a cryptographically-verifiable      --
++-- history of attributable authorship.                                       --
++--                                                                           --
++-- See LICENSE.txt for further details.                                      --
++--                                                                           --
++-- This notice is to be retained where found.                                --
++-------------------------------------------------------------------------------
++
++
++-- Ada Library
++with Ada.Text_IO;      use Ada.Text_IO;
++with Ada.Command_Line; use Ada.Command_Line;
++with Ada.Directories;  use Ada.Directories;
++
++-- Modules for functions
++with Sys;    use Sys;   -- System calls
++with Str;    use Str;   -- String handling
++with Lists;              -- generic linked lists 
++
++
++procedure V is
++	V_Error : exception;
++	
++	-- Option for output, can be turned on/off with +v/-v as command argument
++	Verbose : Boolean := False; 
++	
++	procedure Spew(Message : String) is
++	begin
++		if Verbose then
++			Put_Line(Message);
++		end if;
++	end Spew;
++	
++	
++	type Dir_Values is (Patches, Seals, Wot, Target);
++	subtype In_Dirs is Dir_Values range Patches .. Wot;
++	
++	
++	-- Type for a list of files in a folder, and function to generate it
++	type Dir_Listing is array(Integer range <>) of Str_L;
++	
++	function Get_List(Dir : String; Pattern : String) return Dir_Listing is
++		File_List : Search_Type;          -- Type from Ada.Directories
++		File_Name : Directory_Entry_Type; -- Type from Ada.Directories
++		Count     : Natural :=0;
++	begin
++		-- Maybe there is an easier way to get a count of files without needing 
++		-- to repeat the search?
++		-- First, count the files
++		Start_Search(Search    => File_List, 
++						 Directory => Dir,
++						 Pattern   => Pattern,
++						 Filter    => (Ordinary_File => True, others => False));
++						 
++		while More_Entries(File_List) loop
++			Get_Next_Entry(File_List, File_Name);
++			Count := Count + 1;
++		end loop;
++		
++		-- Second, save file names
++		declare
++			Res : Dir_Listing(1 .. Count);
++		begin
++			Start_Search(Search    => File_List, 
++							 Directory => Dir,
++							 Pattern   => Pattern,
++							 Filter    => (Ordinary_File => True, others => False));
++			Count := 1;				 
++			while More_Entries(File_List) loop
++				Get_Next_Entry(File_List, File_Name);
++				Set(Res(Count), Simple_Name(File_Name));
++				Count := Count + 1;
++			end loop;
++			
++			return Res;
++		end;
++	end Get_List;
++	
++	
++	-- type for holding filename/hash sets for sorting patches, 
++	type File_State is 
++		record
++			File_Name : Str_L;
++			Hash      : Str_L;
++		end record;
++	
++	-- This function will get the filename/hash pairs as found in vpatches
++	function Split(L : String) return File_State is
++		Res : File_State;
++		C   : Character;
++		Pos : Natural := 7;
++	begin
++		-- line is of form "--- a/filename hash" or "+++ b/filename hash"
++		-- start at pos 7 to skip the a or b in the filename 
++		-- (need to verify, do all vpatches start with a/b?)
++		for I in Str_Index'Range loop
++			C   := L(Pos);
++			Pos := Pos + 1;
++			exit when C = ' ';
++			Res.File_Name.Text(I) := C;
++			Res.File_Name.Len := I;
++		end loop;
++		
++		for I in Str_Index'Range loop
++			exit when Pos > L'Last;
++			C := L(Pos);
++			Pos := Pos + 1;
++			Res.Hash.Text(I) := C;
++			Res.Hash.Len := I;
++		end loop;
++		
++		return Res;
++	end;
++	
++	function "=" (Left : File_State; Right : File_State) return Boolean is
++	begin
++		return Left.File_Name = Right.File_Name and Left.Hash = Right.Hash;
++	end "=";
++	
++	-- Linked list types
++	package Str_List   is new Lists (Item_Type => Str_L, Eq => "=");
++	use Str_List;
++	package State_List is new Lists (Item_Type => File_State, Eq => "=");
++	use State_List;
++	
++	
++	-- need a structure to hold {patch_1: [parents, children], ...}
++	type Chunk_Set is 
++		record
++			Patch    : Str_L; -- filname of patch
++			Parents  : State_List.LL_Ptr;
++			Children : State_List.LL_Ptr;
++		end record;
++	
++	
++	-- Variables for use below
++	Dirs : array(Dir_Values) of Str_L;
++	
++	Arg_Num  : Natural := 1;
++	
++	
++	Result  : Exit_Status;       -- Holds result of system commands
++	Found   : Boolean;
++	F       : File_Type;        -- used for reading patch files
++	FLine   : String(1..1000);  -- buffer for reading lines of files
++	Len     : Natural;
++	
++	Unsorted : Str_List.LL_Ptr := null;
++	Flow     : Str_List.LL_Ptr := null;
++	Cursor   : Str_List.LL_Ptr;
++
++begin
++	-- Default dir settings
++	Set( Dirs(Patches), "patches");
++	Set( Dirs(Seals),   "seals");
++	Set( Dirs(Wot),     "wot");
++	Set( Dirs(Target),  "v_out");
++	
++	-- Process the command line args
++	while Arg_Num <= Argument_Count loop
++		declare
++			Arg : String := Argument(Arg_Num);
++		begin
++			Arg_Num := Arg_Num + 1;
++			if Startswith(Arg, "-w") then
++				if Arg_Num > Argument_Count then
++					raise V_Error with "Need a WOT dir after -w";
++				end if;
++				declare
++					Arg2 : String := Argument(Arg_Num);
++				begin
++					Set(Dirs(Wot), Arg2);
++					Arg_Num := Arg_Num + 1;
++				end;
++				
++			elsif Startswith(Arg, "-p") then
++				if Arg_Num > Argument_Count then
++					raise V_Error with "Need a PATCHES dir after -p";
++				end if;
++				declare
++					Arg2 : String := Argument(Arg_Num);
++				begin
++					Set(Dirs(Patches), Arg2);
++					Arg_Num := Arg_Num + 1;
++				end;
++				
++			elsif Startswith(Arg, "-s") then
++				if Arg_Num > Argument_Count then
++					raise V_Error with "Need a SEALS dir after -s";
++				end if;
++				declare
++					Arg2 : String := Argument(Arg_Num);
++				begin
++					Set(Dirs(Seals), Arg2);
++					Arg_Num := Arg_Num + 1;
++				end;
++				
++			elsif Startswith(Arg, "+v") then
++				Verbose := True;
++				
++			elsif Startswith(Arg, "-v") then
++				Verbose := False;
++				
++			else
++				Set(Dirs(Target), Arg);
++				
++			end if;
++		end;
++	end loop;
++	
++	-- check directories to see if they exist
++	Spew("--- Checking directories ..");
++	for Dir in In_Dirs'Range loop
++		Spew(Dir'Image & ": " & Get(Dirs(Dir)));
++		if   not Exists(Get(Dirs(Dir))) 
++		     or else Kind(Get(Dirs(Dir))) /= Directory then
++			
++			raise V_Error with "Missing directory: " & Get(Dirs(Dir));
++		end if;
++	end loop;
++	
++	-- create target directory
++	Spew("TARGET: " & Get(Dirs(Target)));
++	if Exists(Get(Dirs(Target))) then
++		Spew("WARNING: Target directory already exists"); 
++		if Kind(Get(Dirs(Target))) /= Directory then
++			raise V_Error with "Target not a directory: " & Get(Dirs(Target));
++		end if;
++	else
++		Create_Directory(Get(Dirs(Target)));
++	end if;
++	
++	-- get file lists for WoT, patches, and seals
++	Spew("--- Loading files ..");
++	declare
++		Wot_Files   : Dir_Listing := 
++		  Get_List(Dir => Get(Dirs(Wot)),     Pattern => "*.asc");
++		Seal_Files  : Dir_Listing := 
++		  Get_List(Dir => Get(Dirs(Seals)),   Pattern => "*.sig");
++		Patch_Files : Dir_Listing := 
++		  Get_List(Dir => Get(Dirs(Patches)), Pattern => "*.vpatch");
++		
++		Chunks   : array(Patch_Files'Range) of Chunk_Set;
++		Chunk    : Chunk_Set;
++		Patch    : Str_L;
++		F_H      : File_State;
++		State    : State_List.LL_Ptr := null;
++		In_State : Boolean;
++		Cur      : State_List.LL_Ptr;
++	begin
++		
++		-- import sigs
++		Spew("--- Importing keys ..");
++		for Key of Wot_Files loop
++			Run_Command(Command => "gpg --import " & 
++			                       Get(Dirs(Wot)) & "/" & Get(Key), 
++			            Result => Result);
++			if Result /= Success then
++				raise V_Error with "Failed to load key: " & Get(Key);
++			end if;
++		end loop;
++		
++		-- verify signatures
++		Spew("--- Verifying seals ..");
++		for Patch of Patch_Files loop
++			Spew("file " & Get(Patch) & " ..");
++			Found := False;
++			
++			for Seal of Seal_Files loop
++				if Startswith(Seal, Patch) then
++					Found := True;
++					Run_Command(Command => "gpg --verify " & 
++					                      Path_Join(Get(Dirs(Seals)), Get(Seal)) & 
++										       " " & 
++									          Path_Join(Get(Dirs(Patches)), Get(Patch)), 
++									Result => Result);
++					if Result /= Success then
++						raise V_Error with "Verification failed: " 
++						                    & Get(Seal) & " " & Get(Patch);
++					end if;
++				end if;
++			end loop;
++			
++			if not Found then
++				raise V_Error with "No seal found for patch " & Get(Patch);
++			end if;
++			
++		end loop;
++		
++		-- read patch files to get chunks
++		Spew("--- Reading patches .. ");
++		for I in Patch_Files'Range loop
++			Patch := Patch_Files(I);
++			Chunks(I) := (Patch => Patch, Parents => null, Children => null);
++			
++			Open(F, In_File, Path_Join(Get(Dirs(Patches)), Get(Patch)));
++			while not End_Of_File(F) loop
++				Get_Line(F, FLine, Len);
++				if Startswith(FLine(1 .. Len), "diff ") then
++					if End_Of_File(F) then
++						raise V_Error with "Incomplete diff header, file " 
++						                    & Get(Patch);
++					end if;
++					Get_Line(F, FLine, Len);
++					if not Startswith(FLine(1 .. Len), "--- ") then
++						raise V_Error with "Bad diff header, file " 
++						                    & Get(Patch) & " Line " & Line(F)'Image;
++					end if;
++					-- save (file_name, hash) as parent of patch
++					F_H := Split(FLine(1 .. Len));
++					if Get(F_H.Hash) /= "false" then
++						State_List.Append(Chunks(I).Parents, F_H);
++					end if;
++					
++					if End_Of_File(F) then
++						raise V_Error with "Incomplete diff header, file " 
++						                    & Get(Patch);
++					end if;
++					Get_Line(F, FLine, Len);
++					if not Startswith(FLine(1 .. Len), "+++ ") then
++						raise V_Error with "Bad diff header, file " 
++						                    & Get(Patch) & " Line " & Line(F)'Image;
++					end if;
++					-- save (file_name, hash) as child of patch
++					F_H := Split(FLine(1 .. Len));
++					State_List.Append(Chunks(I).Children, F_H);
++				end if;
++			end loop;
++			Close(F);
++		end loop;
++		
++		-- sort into flow
++		Spew("--- Sorting patches into order ..");
++		for P of Patch_Files loop
++			Str_List.Append(Unsorted, P);
++		end loop;
++		
++		while Unsorted /= null loop
++			Cursor := Unsorted;
++			Found  := False;
++			
++			Sort : while Cursor /= null loop
++				-- find entry in chunks
++				for H of Chunks loop
++					if H.Patch = Cursor.Item then
++						Chunk := H;
++						exit;
++					end if;
++				end loop;
++				
++				-- see if all parents are in State
++				In_State := True;
++				Cur := Chunk.Parents;
++				while Cur /= null loop
++					In_State := In_State and Has(State, Cur.Item);
++					exit when not In_State;
++					Cur := Cur.Next;
++				end loop;
++				
++				if In_State then
++					Found := True;
++					
++					Str_List.Append(Flow, Cursor.Item);
++					Str_List.Remove(Unsorted, Cursor.Item);
++					
++					Cur := Chunk.Parents;
++					while Cur /= null loop
++						State_List.Remove(State, Cur.Item);
++						Cur := Cur.Next;
++					end loop;
++					
++					Cur := Chunk.Children;
++					while Cur /= null loop
++						State_List.Append(State, Cur.Item);
++						Cur := Cur.Next;
++					end loop;
++					
++					exit Sort;  -- start sort loop over at the first patch
++				end if;
++				
++				Cursor := Cursor.Next;
++			end loop Sort;
++			
++			if not Found then
++				raise V_Error with "Could not find flow to all patches, e.g. " &
++						Get(Unsorted.Item);
++			end if;
++		end loop;
++	end;
++	Spew("--- Flow is:");
++	Cursor := Flow;
++	while Cursor /= null loop
++		Spew(get(Cursor.Item));
++		Cursor := Cursor.Next;
++	end loop;
++	
++	-- press patches
++	Spew("--- Pressing patches ..");
++	Cursor := Flow;
++	while Cursor /= null loop
++		Spew("  Pressing file " & Get(Cursor.Item));
++		Run_Command(Command => "patch -E --dir " & Get(Dirs(Target)) & " -p1 < " 
++		                       & Path_Join(Get(Dirs(Patches)), Get(Cursor.Item)), 
++		            Result => Result);
++		if Result /= Success then
++			raise V_Error with "Failed to press patch: " & Get(Cursor.Item);
++		end if;
++		Cursor := Cursor.Next;
++	end loop;
++	
++	Spew("--- Done");
++	Set_Exit_Status(Success);
++end V;
+diff -uNr a/v-ada/v_ada.gpr b/v-ada/v_ada.gpr
+--- a/v-ada/v_ada.gpr false
++++ b/v-ada/v_ada.gpr eba433e2f63ea65c3e8a61fb1a947cc0a5c8e260a92fc3439ce1426fcacb140f4f404177243835374ff41fd3d21b34fc9b08732f5b54ab1b025d9675c54d657b
+@@ -0,0 +1,64 @@
++-------------------------------------------------------------------------------
++-- This file is part of V-Ada.                                               --
++--                                                                           --
++-- (C) $2025 Peter Lambert                                                   --
++--                                                                           --
++-- This product is distributed under "The V Public License"                  --
++-- ("VPL"; version 0xFF.)                                                    --
++--                                                                           --
++-- This means that it is a document with a cryptographically-verifiable      --
++-- history of attributable authorship.                                       --
++--                                                                           --
++-- See LICENSE.txt for further details.                                      --
++--                                                                           --
++-- This notice is to be retained where found.                                --
++-------------------------------------------------------------------------------
++
++project V_Ada is
++
++  for Object_Dir use "obj";
++	
++  type Mode_Type is ("debug", "release");
++  Mode : Mode_Type := external ("mode", "release");
++	
++  for Languages   use ("Ada");
++  for Source_Dirs use ("src");
++  for Exec_Dir    use "bin";
++  for Main        use ("v.adb");
++  
++  package Compiler is
++     case Mode is
++        when "debug" =>
++           for Switches ("Ada")
++             use ("-g");
++        when "release" =>
++           for Switches ("Ada")
++             use ("-O2", "-fdump-scos", "-gnata", "-fstack-check",
++                  "-gnatyd", "-gnatym",
++                  "-fdata-sections", "-ffunction-sections");
++     end case;
++  end Compiler;
++  
++  package Binder is
++     case Mode is
++        when "debug" =>
++           for Switches ("Ada")
++             use ();
++        when "release" =>
++           for Switches ("Ada")
++             use ("-static");
++     end case;
++  end Binder;
++  
++  package Linker is
++     case Mode is
++        when "debug" =>
++           for Switches ("Ada")
++             use ();
++        when "release" =>
++           for Switches ("Ada")
++             use ("-Wl,--gc-sections", "-static");
++     end case;
++  end Linker;
++  
++end V_Ada;
